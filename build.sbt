@@ -1,3 +1,12 @@
+//
+// dcolossus
+//
+// dcontext wrapper on top of colossus
+//
+// makes it possible to have fast iteration cycle with a stateful/RESTless
+// server with lots of data.
+//
+
 val scalaMajorVersion = "2.10"
 val scalaMinorVersion = "6"
 val sparkVersion = "1.6.0"

@@ -7,21 +7,21 @@ import fi.veikkaus.dcontext.{ContextTask, HashMapDContext, MutableDContext}
   */
 class ExampleContext extends HashMapDContext {
 
-  val helloService = DColossus().httpDServerCval("example", 9000, classOf[ExampleService])
+  val server = DColossus().httpDServerCval("example", 9000, classOf[ExampleService])
 
   val prefix = ExampleContext.prefix
 
   put(prefix + "start",
       new ContextTask {
         override def run(context: MutableDContext, args: Array[String]): Unit = {
-          helloService(context)
+          server(context)
         }
       })
 
   put(prefix + "stop",
     new ContextTask {
       override def run(context: MutableDContext, args: Array[String]): Unit = {
-        helloService.reset(context)
+        server.reset(context)
       }
     })
 
