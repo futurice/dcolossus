@@ -7,11 +7,13 @@
 // server with lots of data.
 //
 
-val scalaMajorVersion = "2.10"
-val scalaMinorVersion = "6"
+val scalaMajorVersion = "2.11"
+val scalaMinorVersion = "7"
 val sparkVersion = "1.6.0"
 
 scalaVersion := f"${scalaMajorVersion}.${scalaMinorVersion}"
+
+crossScalaVersions := Seq("2.10.6")
 
 version := "0.1"
 
@@ -30,7 +32,7 @@ lazy val testsh =
 lazy val root = (project in file(".")).
   settings(
     name := "dcolossus",
-    organization := "fi.futurice",
+    organization := "com.futurice",
     testsh := {
       val mainClass = "fi.veikkaus.dcontext.Console"
       val keyPath =  f"target/scala-${scalaMajorVersion}/test-classes"
@@ -49,7 +51,7 @@ lazy val root = (project in file(".")).
       val options =  (javaOptions in Test).value
       val log = (streams in Test).value.log
       val args = Seq(f"-p ${dynamicCP.mkString(":")}",
-        "-m fi.futurice.dcolossus.ExampleContext",
+        "-m com.futurice.dcolossus.ExampleContext",
         "-i")
 
       (runner in run).value.run(mainClass, staticCP, args, streams.value.log)

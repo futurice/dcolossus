@@ -1,4 +1,4 @@
-package fi.futurice.dcolossus
+package com.futurice.dcolossus
 
 import colossus.core.ServerContext
 import colossus.protocols.http.HttpRequest

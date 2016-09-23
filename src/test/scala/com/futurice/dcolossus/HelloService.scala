@@ -1,4 +1,4 @@
-package fi.futurice.dcolossus
+package com.futurice.dcolossus
 
 import javax.swing.tree.DefaultMutableTreeNode
 

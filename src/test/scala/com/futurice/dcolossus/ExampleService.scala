@@ -1,4 +1,4 @@
-package fi.futurice.dcolossus
+package com.futurice.dcolossus
 
 /**
   * Created by arau on 5.7.2016.

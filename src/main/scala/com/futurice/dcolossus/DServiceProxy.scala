@@ -1,5 +1,4 @@
-package fi.futurice.dcolossus
-
+package com.futurice.dcolossus
 
 import colossus.protocols.http.HttpService
 import akka.util.ByteString

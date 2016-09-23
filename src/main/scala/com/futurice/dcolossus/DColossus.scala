@@ -1,4 +1,4 @@
-package fi.futurice.dcolossus
+package com.futurice.dcolossus
 
 import akka.actor.ActorSystem
 import colossus.IOSystem
@@ -52,7 +52,7 @@ class DColossus(name:String) extends Contextual(name) {
       val sys = c.system.get
       implicit val actors = actorSystem(c)
       implicit val system = ioSystem(c)
-      Server.start("hello", 9000) { worker => new Initializer(worker) {
+      Server.start(name, port) { worker => new Initializer(worker) {
           def onConnect = context =>
             new DHttpServiceProxy(
               ServiceConfig.Default,

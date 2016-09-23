@@ -1,4 +1,4 @@
-package fi.futurice.dcolossus
+package com.futurice.dcolossus
 
 import fi.veikkaus.dcontext.{ContextTask, HashMapDContext, MutableDContext}
 
