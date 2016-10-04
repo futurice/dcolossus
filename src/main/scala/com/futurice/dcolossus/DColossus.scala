@@ -2,9 +2,9 @@ package com.futurice.dcolossus
 
 import akka.actor.ActorSystem
 import colossus.IOSystem
-import colossus.core.{Initializer, Server, ServerRef}
+import colossus.core._
 import colossus.protocols.http.Http
-import colossus.service.ServiceConfig
+import colossus.service.{Protocol, ServiceCodecProvider, ServiceConfig}
 import fi.veikkaus.dcontext.{ContextTask, ContextVal, Contextual, MutableDContext}
 
 /**
@@ -45,25 +45,39 @@ class DColossus(name:String) extends Contextual(name) {
     closeCmd.reset(c)
   }
 
-  def httpDServerCval(name:String,
-                      port:Int,
-                      className:String) : ContextVal[ServerRef] = {
+  def dserverCval[C <: Protocol](name:String,
+                                 port:Int,
+                                 className:String,
+                                 config:ServiceConfig,
+                                 codecProvider: ServiceCodecProvider[C])
+    : ContextVal[ServerRef] = {
     cvalc(serverPrefix + name) { c =>
       val sys = c.system.get
       implicit val actors = actorSystem(c)
       implicit val system = ioSystem(c)
       Server.start(name, port) { worker => new Initializer(worker) {
-          def onConnect = context =>
-            new DHttpServiceProxy(
-              ServiceConfig.Default,
-              context,
-              c,
-              sys.classLoader().newProxyInstance(classOf[DService[Http]], className))
-        }
+        def onConnect = context =>
+          new DServiceProxy[C](
+            config,
+            codecProvider,
+            context,
+            c,
+            sys.classLoader().newProxyInstance(classOf[DService[C]], className))
+      }
       }(system)
     } { ref =>
       ref.shutdown
     }
+  }
+
+  def httpDServerCval(name:String,
+                      port:Int,
+                      className:String) : ContextVal[ServerRef] = {
+    dserverCval[Http](name,
+                      port,
+                      className,
+                      ServiceConfig.Default,
+                      Http.defaults.httpServerDefaults)
   }
   def httpDServerCval(className:String, port:Int) : ContextVal[ServerRef] = {
     httpDServerCval(className.split('.').last, port, className)
