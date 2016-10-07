@@ -21,7 +21,7 @@ connectInput      in Test := true
 parallelExecution in Test := false
 
 libraryDependencies ++= Seq(
-  "com.tumblr" %% "colossus" % "0.8.0",
+  "com.tumblr" %% "colossus" % "0.8.1",
   "fi.veikkaus" %% "dcontext" % "0.2-SNAPSHOT",
   "com.futurice" %% "testtoys" % "0.1-SNAPSHOT" % "test"
 )
