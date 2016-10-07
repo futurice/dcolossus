@@ -23,13 +23,13 @@ parallelExecution in Test := false
 libraryDependencies ++= Seq(
   "com.tumblr" %% "colossus" % "0.8.1",
   "fi.veikkaus" %% "dcontext" % "0.2-SNAPSHOT",
-  "com.futurice" %% "testtoys" % "0.1-SNAPSHOT" % "test"
+  "com.futurice" %% "testtoys" % "0.2" % "test"
 )
 
 lazy val testsh =
   taskKey[Unit]("interactive shell for running tasks in a JVM instance, while code may be modified")
 
-lazy val root = (project in file(".")).
+lazy val dcolossus = (project in file(".")).
   settings(
     name := "dcolossus",
     organization := "com.futurice",
