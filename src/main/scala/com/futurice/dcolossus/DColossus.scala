@@ -56,13 +56,17 @@ class DColossus(name:String) extends Contextual(name) {
       implicit val actors = actorSystem(c)
       implicit val system = ioSystem(c)
       Server.start(name, port) { worker => new Initializer(worker) {
-        def onConnect = context =>
+        def onConnect = serverContext =>
           new DServiceProxy[C](
             config,
             codecProvider,
-            context,
-            c,
-            sys.classLoader().newProxyInstance(classOf[DService[C]], className))
+            serverContext,
+            sys.classLoader()
+               .newProxyInstance(
+                 classOf[DService[C]],
+                 className,
+                 Array(classOf[MutableDContext], classOf[ServerContext]),
+                 Array(c, serverContext)))
       }
       }(system)
     } { ref =>

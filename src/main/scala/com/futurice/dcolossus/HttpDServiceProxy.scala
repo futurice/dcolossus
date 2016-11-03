@@ -7,7 +7,6 @@ import fi.veikkaus.dcontext.MutableDContext
 
 class DHttpServiceProxy(config:ServiceConfig,
                         serverContext:ServerContext,
-                        dcontext:MutableDContext,
                         service:DService[Http])
-  extends DServiceProxy[Http](config, Http.defaults.httpServerDefaults, serverContext, dcontext, service) {}
+  extends DServiceProxy[Http](config, Http.defaults.httpServerDefaults, serverContext, service) {}
 

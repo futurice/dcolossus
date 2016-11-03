@@ -14,13 +14,10 @@ import UrlParsing._
 import HttpMethod._
 import akka.actor.ActorSystem
 
-class HelloService extends Contextual(ExampleContext.prefix + "services.hello") with DService[Http] {
-  val message = cval("message") { c =>
-    "HELLO"
-  }
-  def handle(sc:ServerContext, c:MutableDContext) = {
+class HelloService(c:MutableDContext, sc:ServerContext) extends DService[Http] {
+  def handle = {
     case request @ Get on Root / "hello" => {
-      Callback.successful(request.ok(message(c)))
+      Callback.successful(request.ok("hello!"))
     }
     case request @ Get on Root => {
       Callback.successful(request.ok(c.keySet.mkString(",")))

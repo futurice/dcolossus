@@ -17,15 +17,14 @@ import fi.veikkaus.dcontext.MutableDContext
 class DServiceProxy[C <: Protocol](config:ServiceConfig,
                                    codecProvider: ServiceCodecProvider[C],
                                    serverContext:ServerContext,
-                                   dcontext:MutableDContext,
                                    service:DService[C])
   extends Service[C](config, serverContext)(codecProvider) {
   override def handle =
     new PartialHandler[C] {
       override def isDefinedAt(x: C#Input): Boolean =
-        service.handle(serverContext, dcontext).isDefinedAt(x)
+        service.handle.isDefinedAt(x)
       override def apply(v1: C#Input): Callback[C#Output] =
-        service.handle(serverContext, dcontext).apply(v1)
+        service.handle.apply(v1)
     }
 }
 

@@ -13,7 +13,7 @@ val sparkVersion = "1.6.0"
 
 scalaVersion := f"${scalaMajorVersion}.${scalaMinorVersion}"
 
-crossScalaVersions := Seq("2.10.6")
+crossScalaVersions := Seq("2.10.6", scalaVersion.value)
 
 version := "0.1"
 
