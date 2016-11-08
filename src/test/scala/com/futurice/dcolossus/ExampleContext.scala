@@ -1,5 +1,7 @@
 package com.futurice.dcolossus
 
+import colossus.protocols.http.Http
+import colossus.service.ServiceConfig
 import fi.veikkaus.dcontext.{ContextTask, HashMapDContext, MutableDContext}
 
 /**
@@ -7,7 +9,16 @@ import fi.veikkaus.dcontext.{ContextTask, HashMapDContext, MutableDContext}
   */
 class ExampleContext extends HashMapDContext {
 
-  val server = DColossus().httpDServerCval("example", 9000, classOf[ExampleService])
+  val server =
+    DColossus().dserverCval2[Http](
+      "hello",
+      9000,
+      classOf[HelloServiceProvider].getName,
+      ServiceConfig.Default,
+      Http.defaults.httpServerDefaults)
+
+//      DColossus().httpDServerCval("example", 9000, classOf[ExampleService])
+
 
   val prefix = ExampleContext.prefix
 

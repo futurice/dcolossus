@@ -25,3 +25,8 @@ class HelloService(c:MutableDContext, sc:ServerContext) extends DService[Http] {
   }
 }
 
+class HelloServiceProvider(c:MutableDContext) extends DServiceProvider[Http] {
+  def apply(serverContext:ServerContext) = {
+    new HelloService(c, serverContext)
+  }
+}

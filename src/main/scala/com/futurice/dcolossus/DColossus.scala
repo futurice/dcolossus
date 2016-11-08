@@ -73,6 +73,39 @@ class DColossus(name:String) extends Contextual(name) {
       ref.shutdown
     }
   }
+  def dserverCval2[C <: Protocol](name:String,
+                                 port:Int,
+                                 className:String,
+                                 config:ServiceConfig,
+                                 codecProvider: ServiceCodecProvider[C])
+  : ContextVal[ServerRef] = {
+    cvalc(serverPrefix + name) { c =>
+      val sys = c.system.get
+      implicit val actors = actorSystem(c)
+      implicit val system = ioSystem(c)
+
+      val serviceProvider =
+        new ProxyServiceProvider[C](
+          sys.classLoader()
+          .newProxyInstance(
+            classOf[DServiceProvider[C]],
+            className,
+            Array(classOf[MutableDContext]),
+            Array(c)))
+
+      Server.start(name, port) { worker => new Initializer(worker) {
+        def onConnect = serverContext =>
+          new DServiceProxy[C](
+            config,
+            codecProvider,
+            serverContext,
+            serviceProvider(serverContext))
+        }
+      }(system)
+    } { ref =>
+      ref.shutdown
+    }
+  }
 
   def httpDServerCval(name:String,
                       port:Int,
