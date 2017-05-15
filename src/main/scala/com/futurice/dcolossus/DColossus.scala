@@ -5,6 +5,7 @@ import colossus.IOSystem
 import colossus.core._
 import colossus.protocols.http.Http
 import colossus.service.{Protocol, ServiceCodecProvider, ServiceConfig}
+import com.typesafe.config.ConfigFactory
 import fi.veikkaus.dcontext.{ContextTask, ContextVal, Contextual, MutableDContext}
 
 /**
@@ -28,7 +29,7 @@ class DColossus(name:String) extends Contextual(name) {
 
   val actorSystem = cvalc("actorSystem") { c =>
     closeCmd(c)
-    ActorSystem("dcolossus")
+    ActorSystem("dcolossus") // , ConfigFactory.defaultReference(c.system.map(_.classLoader()).getOrElse(getClass.getClassLoader)))
   } { sys => sys.shutdown() }
 
   val ioSystem = cvalc("ioSystem") { c =>
