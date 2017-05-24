@@ -1,5 +1,7 @@
 package com.futurice.dcolossus
 
+import java.io.Closeable
+
 import colossus.core.ServerContext
 import colossus.protocols.http.HttpRequest
 import colossus.service.{Protocol, Service}
@@ -14,8 +16,9 @@ trait DService[C <: Protocol] {
   def handle : PartialHandler[C]
 }
 
-trait DServiceProvider[C <: Protocol] {
+trait DServiceProvider[C <: Protocol] extends Closeable {
   def apply(serverContext:ServerContext) : DService[C]
+  def close = {}
 }
 
 class ProxyServiceProvider[C <: Protocol](provider:DServiceProvider[C]) extends DServiceProvider[C] {

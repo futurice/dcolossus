@@ -1,5 +1,7 @@
 package com.futurice.dcolossus
 
+import java.io.Closeable
+
 import colossus.protocols.http.HttpService
 import akka.util.ByteString
 import colossus.IOSystem
