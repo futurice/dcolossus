@@ -18,7 +18,6 @@ trait DService[C <: Protocol] {
 
 trait DServiceProvider[C <: Protocol] extends Closeable {
   def apply(serverContext:ServerContext) : DService[C]
-  def close = {}
 }
 
 class ProxyServiceProvider[C <: Protocol](provider:DServiceProvider[C]) extends DServiceProvider[C] {
