@@ -79,7 +79,7 @@ class DColossus(name:String) extends Contextual(name) {
                                  className:String,
                                  config:ServiceConfig,
                                  codecProvider: ServiceCodecProvider[C])
-  : ContextVal[ServerRef] = {
+  : ContextVal[(ProxyServiceProvider[C], ServerRef)] = {
     cvalc(serverPrefix + name) { c =>
       val sys = c.system.get
       implicit val actors = actorSystem(c)
@@ -94,7 +94,8 @@ class DColossus(name:String) extends Contextual(name) {
             Array(classOf[MutableDContext]),
             Array(c)))
 
-      Server.start(name, port) { worker => new Initializer(worker) {
+      (serviceProvider,
+       Server.start(name, port) { worker => new Initializer(worker) {
         def onConnect = serverContext =>
           new DServiceProxy[C](
             config,
@@ -102,9 +103,10 @@ class DColossus(name:String) extends Contextual(name) {
             serverContext,
             serviceProvider(serverContext))
         }
-      }(system)
-    } { ref =>
-      ref.shutdown
+      }(system))
+    } { case (serviceProvider, ref) =>
+      ref.shutdown // shut down the HTTP service, before the server state
+      serviceProvider.close
     }
   }
 

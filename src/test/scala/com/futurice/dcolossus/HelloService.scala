@@ -29,4 +29,5 @@ class HelloServiceProvider(c:MutableDContext) extends DServiceProvider[Http] {
   def apply(serverContext:ServerContext) = {
     new HelloService(c, serverContext)
   }
+  def close = {}
 }
