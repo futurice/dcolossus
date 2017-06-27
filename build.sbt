@@ -7,13 +7,12 @@
 // server with lots of data.
 //
 
-val scalaMajorVersion = "2.11"
-val scalaMinorVersion = "7"
-val sparkVersion = "1.6.0"
+val scalaMajorVersion = "2.12"
+val scalaMinorVersion = "2"
 
 scalaVersion := f"${scalaMajorVersion}.${scalaMinorVersion}"
 
-crossScalaVersions := Seq("2.10.6", scalaVersion.value)
+crossScalaVersions := Seq("2.10.6", "2.11.7")
 
 version := "0.1"
 
@@ -21,7 +20,7 @@ connectInput      in Test := true
 parallelExecution in Test := false
 
 libraryDependencies ++= Seq(
-  "com.tumblr" %% "colossus" % "0.8.1",
+  "com.tumblr" % "colossus_2.11" % "0.8.1",
   "fi.veikkaus" %% "dcontext" % "0.2-SNAPSHOT",
   "com.futurice" %% "testtoys" % "0.2" % "test"
 )
