@@ -2,9 +2,10 @@ package com.futurice.dcolossus
 
 import akka.actor.ActorSystem
 import colossus.IOSystem
+import colossus.controller.{Codec, Controller, Encoding}
 import colossus.core._
-import colossus.protocols.http.Http
-import colossus.service.{Protocol, ServiceCodecProvider, ServiceConfig}
+import colossus.core.server.{Initializer, Server}
+import colossus.service.{Protocol, ServiceConfig, ServiceServer}
 import fi.veikkaus.dcontext.{ContextTask, ContextVal, Contextual, MutableDContext}
 
 /**
@@ -29,7 +30,7 @@ class DColossus(name:String) extends Contextual(name) {
   val actorSystem = cvalc("actorSystem") { c =>
     closeCmd(c)
     ActorSystem("dcolossus")
-  } { sys => sys.shutdown() }
+  } { sys => sys.terminate()}
 
   val ioSystem = cvalc("ioSystem") { c =>
     closeCmd(c)
@@ -49,24 +50,26 @@ class DColossus(name:String) extends Contextual(name) {
                                  port:Int,
                                  className:String,
                                  config:ServiceConfig,
-                                 codecProvider: ServiceCodecProvider[C])
+                                 codec: Codec[Encoding.Server[C]]
+                                )
     : ContextVal[ServerRef] = {
     cvalc(serverPrefix + name) { c =>
       val sys = c.system.get
       implicit val actors = actorSystem(c)
       implicit val system = ioSystem(c)
       Server.start(name, port) { worker => new Initializer(worker) {
-        def onConnect = serverContext =>
-          new DServiceProxy[C](
+        def onConnect = serverContext => {
+          val dsp = new DServiceProxy[C](
             config,
-            codecProvider,
             serverContext,
             sys.classLoader()
-               .newProxyInstance(
-                 classOf[DService[C]],
-                 className,
-                 Array(classOf[MutableDContext], classOf[ServerContext]),
-                 Array(c, serverContext)))
+              .newProxyInstance(
+                classOf[DService[C]],
+                className,
+                Array(classOf[MutableDContext], classOf[ServerContext]),
+                Array(c, serverContext)))
+          new PipelineHandler(new Controller(new ServiceServer[C](dsp), codec), dsp)
+        }
       }
       }(system)
     } { ref =>
@@ -74,10 +77,11 @@ class DColossus(name:String) extends Contextual(name) {
     }
   }
   def dserverCval2[C <: Protocol](name:String,
-                                 port:Int,
-                                 className:String,
-                                 config:ServiceConfig,
-                                 codecProvider: ServiceCodecProvider[C])
+                                  port:Int,
+                                  className:String,
+                                  config:ServiceConfig,
+                                  codec: Codec[Encoding.Server[C]]
+                                 )
   : ContextVal[ServerRef] = {
     cvalc(serverPrefix + name) { c =>
       val sys = c.system.get
@@ -94,37 +98,41 @@ class DColossus(name:String) extends Contextual(name) {
             Array(c)))
 
       Server.start(name, port) { worker => new Initializer(worker) {
-        def onConnect = serverContext =>
-          new DServiceProxy[C](
+        def onConnect = serverContext => {
+          val dsp = new DServiceProxy[C](
             config,
-            codecProvider,
             serverContext,
             serviceProvider(serverContext))
+            new PipelineHandler(new Controller(new ServiceServer[C](dsp), codec), dsp)
         }
+        }
+
       }(system)
     } { ref =>
       ref.shutdown
     }
   }
 
-  def httpDServerCval(name:String,
-                      port:Int,
-                      className:String) : ContextVal[ServerRef] = {
-    dserverCval[Http](name,
-                      port,
-                      className,
-                      ServiceConfig.Default,
-                      Http.defaults.httpServerDefaults)
-  }
-  def httpDServerCval(className:String, port:Int) : ContextVal[ServerRef] = {
-    httpDServerCval(className.split('.').last, port, className)
-  }
-  def httpDServerCval[C <: DService[Http]](className:Class[C], port:Int) : ContextVal[ServerRef] = {
-    httpDServerCval(className.getName, port)
-  }
-  def httpDServerCval[C <: DService[Http]](serverName:String, port:Int, className:Class[C]) : ContextVal[ServerRef] = {
-    httpDServerCval(serverName, port, className.getName)
-  }
+//  def httpDServerCval(name:String,
+//                      port:Int,
+//                      className:String) : ContextVal[ServerRef] = {
+//    dserverCval[Http](
+//      name,
+//      port,
+//      className,
+//      ServiceConfig.Default,
+//      new StaticHttpServerCodec
+//    )
+//  }
+//  def httpDServerCval(className:String, port:Int) : ContextVal[ServerRef] = {
+//    httpDServerCval(className.split('.').last, port, className)
+//  }
+//  def httpDServerCval[C <: DService[Http]](className:Class[C], port:Int) : ContextVal[ServerRef] = {
+//    httpDServerCval(className.getName, port)
+//  }
+//  def httpDServerCval[C <: DService[Http]](serverName:String, port:Int, className:Class[C]) : ContextVal[ServerRef] = {
+//    httpDServerCval(serverName, port, className.getName)
+//  }
 }
 
 object DColossus {

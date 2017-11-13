@@ -15,13 +15,13 @@ scalaVersion := f"${scalaMajorVersion}.${scalaMinorVersion}"
 
 crossScalaVersions := Seq("2.10.6", scalaVersion.value)
 
-version := "0.1"
+version := "0.2"
 
 connectInput      in Test := true
 parallelExecution in Test := false
 
 libraryDependencies ++= Seq(
-  "com.tumblr" %% "colossus" % "0.8.1",
+  "com.tumblr" %% "colossus" % "0.10.1",
   "fi.veikkaus" %% "dcontext" % "0.2-SNAPSHOT",
   "com.futurice" %% "testtoys" % "0.2" % "test"
 )
